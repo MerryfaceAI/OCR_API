@@ -1,0 +1,35 @@
+version: "3.8"  # Or another supported version like "2.1"
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    image: ocr_api-frontend:latest
+    ports:
+      - "80:80"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  backend:
+  build:
+    context: ./backend
+    dockerfile: Dockerfile
+  image: ocr_api-backend:latest
+  environment:
+    - FLASK_ENV=production
+    - DATABASE_URL=${DATABASE_URL}
+  ports:
+    - "5000:5000"
+  healthcheck:
+    test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+    interval: 30s
+    timeout: 10s
+    retries: 3
+    start_period: 10s
+  networks:
+    - app-network
